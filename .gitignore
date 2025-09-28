@@ -1,0 +1,20 @@
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+
+# Tkinter/Project files
+*.json
+*.pickle
+
+# Specifically ignore sensitive Google credentials
+credentials.json
+token.json
+token.pickle
+
+# VS Code settings
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
