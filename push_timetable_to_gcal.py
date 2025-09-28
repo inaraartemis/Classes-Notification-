@@ -97,10 +97,8 @@ def add_events_to_calendar(service, timetable, start_date, end_date, progress_ca
             if cls_day_num is None or cls_day_num != weekday_num:
                 continue
             start_dt, end_dt = parse_time_slot(current_date, cls["time_slot"])
-            code = cls.get("code") or cls.get("subject","")  # course code first
-            summary = f"{cls.get('time_slot','')} - {code}"  # time + course code
             events_to_add.append({
-                "summary": summary,
+                "summary": cls.get("course_code", "Class"),
                 "location": cls.get("room", ""),
                 "description": "source: timetable-script",
                 "start": {"dateTime": start_dt.isoformat(), "timeZone":"Asia/Kolkata"},
@@ -153,28 +151,21 @@ class TimetableGUI:
 
         # Preview
         tk.Label(root, text="Upcoming Classes Preview:", bg=BG_COLOR, fg=LABEL_FG, font=FONT_LABEL).pack(pady=(10,5))
-        self.preview_text = tk.Text(root, height=25, width=45, bg="white", fg="black")
+        self.preview_text = tk.Text(root, height=15, width=45, bg="white", fg="black")
         self.preview_text.pack(pady=5)
         self.preview_text.insert(tk.END, "Load timetable preview here...")
         self.preview_text.config(state=tk.DISABLED)
 
-        # Load timetable JSON and flatten
+        # Load timetable JSON
         with open("timetable.json", "r") as f:
             data = json.load(f)
 
         self.timetable = []
         for day, slots in data["timetable"].items():
-            for time_slot, cls_str in slots.items():
-                parts = cls_str.split(" / ")
-                cls_dict = {"day": day, "time_slot": time_slot}
-                for part in parts:
-                    if part.startswith("C:"):
-                        cls_dict["code"] = part[2:]
-                    elif part.startswith("R:"):
-                        cls_dict["room"] = part[2:]
-                    elif part.startswith("S:"):
-                        cls_dict["subject"] = part[2:]
-                self.timetable.append(cls_dict)
+            for time_slot, cls_entry in slots.items():
+                cls_entry["day"] = day
+                cls_entry["time_slot"] = time_slot
+                self.timetable.append(cls_entry)
 
         self.load_preview()
 
@@ -186,17 +177,9 @@ class TimetableGUI:
     def load_preview(self):
         self.preview_text.config(state=tk.NORMAL)
         self.preview_text.delete("1.0", tk.END)
-        days_order = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
-        for day in days_order:
-            day_classes = [cls for cls in self.timetable if cls["day"] == day]
-            if not day_classes:
-                continue
-            self.preview_text.insert(tk.END, f"{day}:\n")
-            for cls in day_classes:
-                code = cls.get("code") or cls.get("subject","")  # course code first
-                line = f"  {cls.get('time_slot','')} - {code}\n"
-                self.preview_text.insert(tk.END, line)
-            self.preview_text.insert(tk.END, "\n")
+        for cls in self.timetable[:20]:
+            line = f"{cls['time_slot']} - {cls.get('subject_code', cls.get('course_code',''))}\n"
+            self.preview_text.insert(tk.END,line)
         self.preview_text.config(state=tk.DISABLED)
 
     def delete_old(self):
@@ -206,8 +189,7 @@ class TimetableGUI:
                 self.update_progress(0, "Deleting old events...")
                 count = delete_timetable_events(service)
                 self.update_progress(100, f"Deleted {count} old events")
-                messagebox.showinfo("Done", f"Deleted {count} old timetable events.")
-                self.update_progress(0)
+                messagebox.showinfo("Done", f"Deleted {count} old events from Google Calendar.")
             except Exception as e:
                 messagebox.showerror("Error", str(e))
         threading.Thread(target=run_delete).start()
@@ -216,18 +198,17 @@ class TimetableGUI:
         def run_add():
             try:
                 service = get_service()
-                self.update_progress(0, "Adding timetable events...")
-                start_date = self.start_date.get_date()
-                end_date = self.end_date.get_date()
-                total = add_events_to_calendar(service, self.timetable, start_date, end_date, self.update_progress)
+                start = self.start_date.get_date()
+                end = self.end_date.get_date()
+                self.update_progress(0, "Adding events...")
+                total = add_events_to_calendar(service, self.timetable, start, end, self.update_progress)
                 self.update_progress(100, f"Added {total} events")
-                messagebox.showinfo("Done", f"Added {total} timetable events.")
-                self.update_progress(0)
+                messagebox.showinfo("Done", f"Added {total} events to Google Calendar.")
             except Exception as e:
                 messagebox.showerror("Error", str(e))
         threading.Thread(target=run_add).start()
 
-
+# ------------------- Main -------------------
 if __name__ == "__main__":
     root = tk.Tk()
     app = TimetableGUI(root)

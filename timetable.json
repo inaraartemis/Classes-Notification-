@@ -5,145 +5,55 @@
   },
   "timetable": {
     "Monday": {
-      "09-10 AM": "Lecture / G:All C:PETS13 / R:Myclass-1 / S:KF844",
-      "11-12 AM": "Lecture / G:All C:PEA306 / R:MyClass-1 / S:KF544",
-      "12-01 PM": "Lecture / G:All C:PEA306 / R:MyClass-1 / S:KF544",
-      "03-04 PM": "Lecture / G:All C:CSE322 / R:MyClass-1 / S:KF543",
-      "04-05 PM": "Lecture / G:All C:CSE322 / R:MyClass-1 / S:KF543"
+      "09-10 AM": {"type":"Lecture","group":"All","course_code":"PETS13","room":"Myclass-1","subject_code":"KF844"},
+      "11-12 AM": {"type":"Lecture","group":"All","course_code":"PEA306","room":"MyClass-1","subject_code":"KF544"},
+      "12-01 PM": {"type":"Lecture","group":"All","course_code":"PEA306","room":"MyClass-1","subject_code":"KF544"},
+      "03-04 PM": {"type":"Lecture","group":"All","course_code":"CSE322","room":"MyClass-1","subject_code":"KF543"},
+      "04-05 PM": {"type":"Lecture","group":"All","course_code":"CSE322","room":"MyClass-1","subject_code":"KF543"}
     },
     "Tuesday": {
-      "09-10 AM": "Lecture / G:All C:PETS13 / R:Myclass-1 / S:KF844",
-      "11-12 AM": "Lecture / G:All C:PEA306 / R:MyClass-1 / S:KF544",
-      "12-01 PM": "Lecture / G:All C:PEA306 / R:MyClass-1 / S:KF544",
-      "03-04 PM": "Lecture / G:All C:CSE322 / R:MyClass-1 / S:KF543",
-      "04-05 PM": "Lecture / G:All C:CSE322 / R:MyClass-1 / S:KF543"
+      "09-10 AM": {"type":"Lecture","group":"All","course_code":"PETS13","room":"Myclass-1","subject_code":"KF844"},
+      "11-12 AM": {"type":"Lecture","group":"All","course_code":"PEA306","room":"MyClass-1","subject_code":"KF544"},
+      "12-01 PM": {"type":"Lecture","group":"All","course_code":"PEA306","room":"MyClass-1","subject_code":"KF544"},
+      "03-04 PM": {"type":"Lecture","group":"All","course_code":"CSE322","room":"MyClass-1","subject_code":"KF543"},
+      "04-05 PM": {"type":"Lecture","group":"All","course_code":"CSE322","room":"MyClass-1","subject_code":"KF543"}
     },
     "Wednesday": {
-      "11-12 AM": "Lecture / G:All C:PEA306 / R:MyClass-1 / S:KF544",
-      "12-01 PM": "Lecture / G:All C:PEA306 / R:MyClass-1 / S:KF544",
-      "03-04 PM": "Lecture / G:All C:CSE322 / R:MyClass-1 / S:KF543",
-      "04-05 PM": "Lecture / G:All C:CSE322 / R:MyClass-1 / S:KF543"
+      "11-12 AM": {"type":"Lecture","group":"All","course_code":"PEA306","room":"MyClass-1","subject_code":"KF544"},
+      "12-01 PM": {"type":"Lecture","group":"All","course_code":"PEA306","room":"MyClass-1","subject_code":"KF544"},
+      "03-04 PM": {"type":"Lecture","group":"All","course_code":"CSE322","room":"MyClass-1","subject_code":"KF543"},
+      "04-05 PM": {"type":"Lecture","group":"All","course_code":"CSE322","room":"MyClass-1","subject_code":"KF543"}
     },
     "Thursday": {
-      "11-12 AM": "Lecture / G:All C:PETS13 / R:Myclass-1 / S:KF844",
-      "03-04 PM": "Lecture / G:All C:PEA306 / R:MyClass-1 / S:KF544",
-      "04-05 PM": "Lecture / G:All C:PEA306 / R:MyClass-1 / S:KF544"
+      "11-12 AM": {"type":"Lecture","group":"All","course_code":"PETS13","room":"Myclass-1","subject_code":"KF844"},
+      "03-04 PM": {"type":"Lecture","group":"All","course_code":"PEA306","room":"MyClass-1","subject_code":"KF544"},
+      "04-05 PM": {"type":"Lecture","group":"All","course_code":"PEA306","room":"MyClass-1","subject_code":"KF544"}
     },
     "Friday": {
-      "09-10 AM": "Lecture / G:All C:PETS13 / R:Myclass-1 / S:KF844",
-      "11-12 AM": "Lecture / G:All C:PEA306 / R:MyClass-1 / S:KF544",
-      "12-01 PM": "Lecture / G:All C:PEA306 / R:MyClass-1 / S:KF544",
-      "03-04 PM": "Lecture / G:All C:CSE322 / R:MyClass-1 / S:KF543",
-      "04-05 PM": "Lecture / G:All C:CSE322 / R:MyClass-1 / S:KF543"
+      "09-10 AM": {"type":"Lecture","group":"All","course_code":"PETS13","room":"Myclass-1","subject_code":"KF844"},
+      "11-12 AM": {"type":"Lecture","group":"All","course_code":"PEA306","room":"MyClass-1","subject_code":"KF544"},
+      "12-01 PM": {"type":"Lecture","group":"All","course_code":"PEA306","room":"MyClass-1","subject_code":"KF544"},
+      "03-04 PM": {"type":"Lecture","group":"All","course_code":"CSE322","room":"MyClass-1","subject_code":"KF543"},
+      "04-05 PM": {"type":"Lecture","group":"All","course_code":"CSE322","room":"MyClass-1","subject_code":"KF543"}
     },
     "Saturday": {
-      "11-12 AM": "Lecture / G:All C:PEA306 / R:MyClass-1 / S:KF544",
-      "12-01 PM": "Lecture / G:All C:PEA306 / R:MyClass-1 / S:KF544",
-      "03-04 PM": "Lecture / G:All C:CSE322 / R:MyClass-1 / S:KF543",
-      "04-05 PM": "Lecture / G:All C:CSE322 / R:MyClass-1 / S:KF543"
+      "11-12 AM": {"type":"Lecture","group":"All","course_code":"PEA306","room":"MyClass-1","subject_code":"KF544"},
+      "12-01 PM": {"type":"Lecture","group":"All","course_code":"PEA306","room":"MyClass-1","subject_code":"KF544"},
+      "03-04 PM": {"type":"Lecture","group":"All","course_code":"CSE322","room":"MyClass-1","subject_code":"KF543"},
+      "04-05 PM": {"type":"Lecture","group":"All","course_code":"CSE322","room":"MyClass-1","subject_code":"KF543"}
     },
     "Sunday": {}
   },
   "courses": [
-    {
-      "code": "CSE322",
-      "type": "CR",
-      "title": "FORMAL LANGUAGES AND AUTOMATION THEORY",
-      "lectures": 3,
-      "tutorials": 0,
-      "practical": 0,
-      "credits": 3,
-      "faculty": "Abhishek Kori (34-202-CH28)"
-    },
-    {
-      "code": "CSR304",
-      "type": "CR",
-      "title": "ARTIFICIAL INTELLIGENCE AND MACHINE LEARNING - I",
-      "lectures": 3,
-      "tutorials": 0,
-      "practical": 2,
-      "credits": 4,
-      "faculty": "NA"
-    },
-    {
-      "code": "CSR314",
-      "type": "CR",
-      "title": "SKILL DEVELOPMENT - I",
-      "lectures": 2,
-      "tutorials": 0,
-      "practical": 2,
-      "credits": 3,
-      "faculty": "NA"
-    },
-    {
-      "code": "CSR327",
-      "type": "CR",
-      "title": "ADVANCED DATA PIPELINE AND TRANSFORMATION USING AZURE",
-      "lectures": 2,
-      "tutorials": 0,
-      "practical": 2,
-      "credits": 3,
-      "faculty": "NA"
-    },
-    {
-      "code": "CSR340",
-      "type": "CR",
-      "title": "INTERNSHIP I",
-      "lectures": 0,
-      "tutorials": 0,
-      "practical": 6,
-      "credits": 3,
-      "faculty": "NA"
-    },
-    {
-      "code": "PEA306",
-      "type": "APE",
-      "title": "ANALYTICAL SKILLS-II",
-      "lectures": 2,
-      "tutorials": 1,
-      "practical": 0,
-      "credits": 3,
-      "faculty": "Vipendra Singh Chauhan (38-509-CH25)"
-    },
-    {
-      "code": "PEMS08",
-      "type": "PE",
-      "title": "MENTORING - VIII",
-      "lectures": 1,
-      "tutorials": 0,
-      "practical": 0,
-      "credits": 0,
-      "faculty": "NA"
-    },
-    {
-      "code": "PETS13",
-      "type": "AD",
-      "title": "DATA STRUCTURE - II",
-      "lectures": 1,
-      "tutorials": 0,
-      "practical": 0,
-      "credits": 0,
-      "faculty": "Satyam Raj"
-    },
-    {
-      "code": "PEV301",
-      "type": "CR",
-      "title": "VERBAL ABILITY",
-      "lectures": 2,
-      "tutorials": 2,
-      "practical": 0,
-      "credits": 4,
-      "faculty": "NA"
-    },
-    {
-      "code": "PSY291",
-      "type": "OM",
-      "title": "PSYCHOLOGICAL TESTING",
-      "lectures": 3,
-      "tutorials": 0,
-      "practical": 0,
-      "credits": 3,
-      "faculty": "NA"
-    }
+    {"code":"CSE322","title":"FORMAL LANGUAGES AND AUTOMATION THEORY"},
+    {"code":"CSR304","title":"ARTIFICIAL INTELLIGENCE AND MACHINE LEARNING - I"},
+    {"code":"CSR314","title":"SKILL DEVELOPMENT - I"},
+    {"code":"CSR327","title":"ADVANCED DATA PIPELINE AND TRANSFORMATION USING AZURE"},
+    {"code":"CSR340","title":"INTERNSHIP I"},
+    {"code":"PEA306","title":"ANALYTICAL SKILLS-II"},
+    {"code":"PEMS08","title":"MENTORING - VIII"},
+    {"code":"PETS13","title":"DATA STRUCTURE - II"},
+    {"code":"PEV301","title":"VERBAL ABILITY"},
+    {"code":"PSY291","title":"PSYCHOLOGICAL TESTING"}
   ]
 }
