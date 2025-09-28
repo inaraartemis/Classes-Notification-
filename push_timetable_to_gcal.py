@@ -1,3 +1,218 @@
+# import tkinter as tk
+# from tkinter import ttk, messagebox
+# from tkcalendar import DateEntry
+# from datetime import datetime, timedelta
+# import threading
+# import json
+# import os
+# import pickle
+# from googleapiclient.discovery import build
+# from google_auth_oauthlib.flow import InstalledAppFlow
+# from google.auth.transport.requests import Request
+
+# # ------------------- Colors & Style -------------------
+# BG_COLOR = "#d9c7b8"        # Light coffee background
+# BUTTON_COLOR = "#8b5e3c"    # Dark coffee buttons
+# BUTTON_FG = "white"
+# LABEL_FG = "#3e2f2f"
+# FONT_TITLE = ("Helvetica", 18, "bold")
+# FONT_LABEL = ("Helvetica", 12)
+# FONT_BUTTON = ("Helvetica", 12, "bold")
+
+# # ------------------- Google Calendar Setup -------------------
+# SCOPES = ["https://www.googleapis.com/auth/calendar"]
+
+# def get_service():
+#     creds = None
+#     if os.path.exists("token.pickle"):
+#         with open("token.pickle", "rb") as token:
+#             creds = pickle.load(token)
+#     if not creds or not creds.valid:
+#         if creds and creds.expired and creds.refresh_token:
+#             creds.refresh(Request())
+#         else:
+#             flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
+#             creds = flow.run_local_server(port=0)
+#         with open("token.pickle", "wb") as token:
+#             pickle.dump(creds, token)
+#     service = build("calendar", "v3", credentials=creds)
+#     return service
+
+# def delete_timetable_events(service):
+#     now = datetime.utcnow().isoformat() + "Z"
+#     events_result = service.events().list(
+#         calendarId="primary", timeMin=now, maxResults=2500, singleEvents=True
+#     ).execute()
+#     events = events_result.get("items", [])
+#     count = 0
+#     for event in events:
+#         if event.get("description") == "source: timetable-script":
+#             service.events().delete(calendarId="primary", eventId=event["id"]).execute()
+#             count += 1
+#     return count
+
+# # ------------------- Time Parsing -------------------
+# def parse_time_slot(current_date, slot_str):
+#     try:
+#         slot_str = slot_str.strip().upper()
+#         if "-" not in slot_str:
+#             raise ValueError("Invalid time slot format")
+#         start_str, end_str = slot_str.split("-")
+#         period = "AM" if "AM" in slot_str else "PM"
+#         start_hour = int("".join(c for c in start_str if c.isdigit()))
+#         end_hour = int("".join(c for c in end_str if c.isdigit()))
+
+#         if start_hour == 12:
+#             start_hour_24 = 0 if period == "AM" else 12
+#         else:
+#             start_hour_24 = start_hour if period == "AM" else start_hour + 12
+
+#         if end_hour == 12:
+#             end_hour_24 = 0 if period == "AM" else 12
+#         else:
+#             end_hour_24 = end_hour if period == "AM" else end_hour + 12
+
+#         start_dt = datetime.combine(current_date, datetime.min.time()) + timedelta(hours=start_hour_24)
+#         end_dt = datetime.combine(current_date, datetime.min.time()) + timedelta(hours=end_hour_24)
+#         if end_dt <= start_dt:
+#             end_dt = start_dt + timedelta(hours=1)
+#         return start_dt, end_dt
+#     except Exception as e:
+#         print(f"Error parsing time slot '{slot_str}': {e}")
+#         start_dt = datetime.combine(current_date, datetime.strptime("09:00 AM", "%I:%M %p").time())
+#         end_dt = start_dt + timedelta(hours=1)
+#         return start_dt, end_dt
+
+# def add_events_to_calendar(service, timetable, start_date, end_date, progress_callback):
+#     days_map = {"Monday":0, "Tuesday":1, "Wednesday":2, "Thursday":3, "Friday":4, "Saturday":5, "Sunday":6}
+#     current_date = datetime.combine(start_date, datetime.min.time())
+#     end_datetime = datetime.combine(end_date, datetime.min.time())
+#     events_to_add = []
+
+#     while current_date <= end_datetime:
+#         weekday_num = current_date.weekday()
+#         for cls in timetable:
+#             day_name = cls["day"].strip()
+#             cls_day_num = days_map.get(day_name)
+#             if cls_day_num is None or cls_day_num != weekday_num:
+#                 continue
+#             start_dt, end_dt = parse_time_slot(current_date, cls["time_slot"])
+#             events_to_add.append({
+#                 "summary": cls.get("course_code", "Class"),
+#                 "location": cls.get("room", ""),
+#                 "description": "source: timetable-script",
+#                 "start": {"dateTime": start_dt.isoformat(), "timeZone":"Asia/Kolkata"},
+#                 "end": {"dateTime": end_dt.isoformat(), "timeZone":"Asia/Kolkata"}
+#             })
+#         current_date += timedelta(days=1)
+
+#     total = len(events_to_add)
+#     for i, event in enumerate(events_to_add, 1):
+#         service.events().insert(calendarId="primary", body=event).execute()
+#         progress_callback(int(i/total*100), f"Adding {i}/{total} events")
+#     return total
+
+# # ------------------- GUI -------------------
+# class TimetableGUI:
+#     def __init__(self, root):
+#         self.root = root
+#         self.root.title("Mi Clase Programadora")
+#         self.root.geometry("400x650")
+#         self.root.configure(bg=BG_COLOR)
+#         self.root.resizable(False, False)
+
+#         # Header
+#         tk.Label(root, text="☕ Mi Clase Programadora", bg=BG_COLOR, fg=LABEL_FG, font=FONT_TITLE).pack(pady=15)
+
+#         # Date selection
+#         date_frame = tk.Frame(root, bg=BG_COLOR)
+#         date_frame.pack(pady=10)
+#         tk.Label(date_frame, text="Start Date:", bg=BG_COLOR, fg=LABEL_FG, font=FONT_LABEL).grid(row=0, column=0, padx=5, pady=5, sticky="w")
+#         self.start_date = DateEntry(date_frame, width=15, background='brown', foreground='white', borderwidth=2)
+#         self.start_date.grid(row=0, column=1, padx=5, pady=5)
+#         tk.Label(date_frame, text="End Date:", bg=BG_COLOR, fg=LABEL_FG, font=FONT_LABEL).grid(row=1, column=0, padx=5, pady=5, sticky="w")
+#         self.end_date = DateEntry(date_frame, width=15, background='brown', foreground='white', borderwidth=2)
+#         self.end_date.grid(row=1, column=1, padx=5, pady=5)
+
+#         # Buttons
+#         button_frame = tk.Frame(root, bg=BG_COLOR)
+#         button_frame.pack(pady=20)
+#         self.delete_btn = tk.Button(button_frame, text="🗑 Delete Old Events", bg=BUTTON_COLOR, fg=BUTTON_FG, font=FONT_BUTTON, width=25, command=self.delete_old)
+#         self.delete_btn.pack(pady=10)
+#         self.add_btn = tk.Button(button_frame, text="➕ Add Timetable Events", bg=BUTTON_COLOR, fg=BUTTON_FG, font=FONT_BUTTON, width=25, command=self.add_new)
+#         self.add_btn.pack(pady=10)
+
+#         # Progress
+#         tk.Label(root, text="Progress:", bg=BG_COLOR, fg=LABEL_FG, font=FONT_LABEL).pack(pady=(20,5))
+#         self.progress = ttk.Progressbar(root, orient="horizontal", length=350, mode="determinate")
+#         self.progress.pack(pady=5)
+#         self.progress_label = tk.Label(root, text="", bg=BG_COLOR, fg=LABEL_FG, font=FONT_LABEL)
+#         self.progress_label.pack(pady=(5,10))
+
+#         # Preview
+#         tk.Label(root, text="Upcoming Classes Preview:", bg=BG_COLOR, fg=LABEL_FG, font=FONT_LABEL).pack(pady=(10,5))
+#         self.preview_text = tk.Text(root, height=15, width=45, bg="white", fg="black")
+#         self.preview_text.pack(pady=5)
+#         self.preview_text.insert(tk.END, "Load timetable preview here...")
+#         self.preview_text.config(state=tk.DISABLED)
+
+#         # Load timetable JSON
+#         with open("timetable.json", "r") as f:
+#             data = json.load(f)
+
+#         self.timetable = []
+#         for day, slots in data["timetable"].items():
+#             for time_slot, cls_entry in slots.items():
+#                 cls_entry["day"] = day
+#                 cls_entry["time_slot"] = time_slot
+#                 self.timetable.append(cls_entry)
+
+#         self.load_preview()
+
+#     def update_progress(self, value, label_text=""):
+#         self.progress["value"] = value
+#         self.progress_label.config(text=label_text)
+#         self.root.update_idletasks()
+
+#     def load_preview(self):
+#         self.preview_text.config(state=tk.NORMAL)
+#         self.preview_text.delete("1.0", tk.END)
+#         for cls in self.timetable[:20]:
+#             line = f"{cls['time_slot']} - {cls.get('subject_code', cls.get('course_code',''))}\n"
+#             self.preview_text.insert(tk.END,line)
+#         self.preview_text.config(state=tk.DISABLED)
+
+#     def delete_old(self):
+#         def run_delete():
+#             try:
+#                 service = get_service()
+#                 self.update_progress(0, "Deleting old events...")
+#                 count = delete_timetable_events(service)
+#                 self.update_progress(100, f"Deleted {count} old events")
+#                 messagebox.showinfo("Done", f"Deleted {count} old events from Google Calendar.")
+#             except Exception as e:
+#                 messagebox.showerror("Error", str(e))
+#         threading.Thread(target=run_delete).start()
+
+#     def add_new(self):
+#         def run_add():
+#             try:
+#                 service = get_service()
+#                 start = self.start_date.get_date()
+#                 end = self.end_date.get_date()
+#                 self.update_progress(0, "Adding events...")
+#                 total = add_events_to_calendar(service, self.timetable, start, end, self.update_progress)
+#                 self.update_progress(100, f"Added {total} events")
+#                 messagebox.showinfo("Done", f"Added {total} events to Google Calendar.")
+#             except Exception as e:
+#                 messagebox.showerror("Error", str(e))
+#         threading.Thread(target=run_add).start()
+
+# # ------------------- Main -------------------
+# if __name__ == "__main__":
+#     root = tk.Tk()
+#     app = TimetableGUI(root)
+#     root.mainloop()
 import tkinter as tk
 from tkinter import ttk, messagebox
 from tkcalendar import DateEntry
@@ -97,12 +312,22 @@ def add_events_to_calendar(service, timetable, start_date, end_date, progress_ca
             if cls_day_num is None or cls_day_num != weekday_num:
                 continue
             start_dt, end_dt = parse_time_slot(current_date, cls["time_slot"])
+            course_code = cls.get("code", "")
+            course_title = cls.get("subject", "")
+            room = cls.get("room", "")
             events_to_add.append({
-                "summary": cls.get("course_code", "Class"),
-                "location": cls.get("room", ""),
+                "summary": f"{course_code} - {course_title}",
+                "location": room,
                 "description": "source: timetable-script",
                 "start": {"dateTime": start_dt.isoformat(), "timeZone":"Asia/Kolkata"},
-                "end": {"dateTime": end_dt.isoformat(), "timeZone":"Asia/Kolkata"}
+                "end": {"dateTime": end_dt.isoformat(), "timeZone":"Asia/Kolkata"},
+                "reminders": {
+                    "useDefault": False,
+                    "overrides": [
+                        {"method": "popup", "minutes": 15},
+                        {"method": "popup", "minutes": 5}
+                    ]
+                }
             })
         current_date += timedelta(days=1)
 
@@ -160,13 +385,7 @@ class TimetableGUI:
         with open("timetable.json", "r") as f:
             data = json.load(f)
 
-        self.timetable = []
-        for day, slots in data["timetable"].items():
-            for time_slot, cls_entry in slots.items():
-                cls_entry["day"] = day
-                cls_entry["time_slot"] = time_slot
-                self.timetable.append(cls_entry)
-
+        self.timetable = data["timetable_flat"]  # Using new flat format
         self.load_preview()
 
     def update_progress(self, value, label_text=""):
@@ -178,37 +397,28 @@ class TimetableGUI:
         self.preview_text.config(state=tk.NORMAL)
         self.preview_text.delete("1.0", tk.END)
         for cls in self.timetable[:20]:
-            line = f"{cls['time_slot']} - {cls.get('subject_code', cls.get('course_code',''))}\n"
+            line = f"{cls.get('day','')} | {cls.get('time_slot','')} | {cls.get('code','')} | {cls.get('subject','')} | {cls.get('room','')}\n"
             self.preview_text.insert(tk.END,line)
         self.preview_text.config(state=tk.DISABLED)
 
     def delete_old(self):
-        def run_delete():
-            try:
-                service = get_service()
-                self.update_progress(0, "Deleting old events...")
-                count = delete_timetable_events(service)
-                self.update_progress(100, f"Deleted {count} old events")
-                messagebox.showinfo("Done", f"Deleted {count} old events from Google Calendar.")
-            except Exception as e:
-                messagebox.showerror("Error", str(e))
-        threading.Thread(target=run_delete).start()
+        def task():
+            service = get_service()
+            count = delete_timetable_events(service)
+            self.update_progress(100, f"Deleted {count} old events")
+            messagebox.showinfo("Done", f"Deleted {count} old events")
+        threading.Thread(target=task).start()
 
     def add_new(self):
-        def run_add():
-            try:
-                service = get_service()
-                start = self.start_date.get_date()
-                end = self.end_date.get_date()
-                self.update_progress(0, "Adding events...")
-                total = add_events_to_calendar(service, self.timetable, start, end, self.update_progress)
-                self.update_progress(100, f"Added {total} events")
-                messagebox.showinfo("Done", f"Added {total} events to Google Calendar.")
-            except Exception as e:
-                messagebox.showerror("Error", str(e))
-        threading.Thread(target=run_add).start()
+        start_date = self.start_date.get_date()
+        end_date = self.end_date.get_date()
+        def task():
+            service = get_service()
+            total = add_events_to_calendar(service, self.timetable, start_date, end_date, self.update_progress)
+            messagebox.showinfo("Done", f"Added {total} events to Google Calendar")
+        threading.Thread(target=task).start()
 
-# ------------------- Main -------------------
+
 if __name__ == "__main__":
     root = tk.Tk()
     app = TimetableGUI(root)
